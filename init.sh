@@ -70,3 +70,5 @@ elif [ "$OS" = "Ubuntu" ]; then
 fi
 
 echo "Server setup script completed."
+
+#https://eduardstal.com/blogs/uctronics-rack-display/U6143_ssd1306.zip
