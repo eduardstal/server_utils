@@ -106,3 +106,49 @@ echo "Server setup script completed."
 ###########################
 
 #https://eduardstal.com/blogs/uctronics-rack-display/U6143_ssd1306.zip
+
+For ubuntu:
+cd /home/eduardstal
+wget https://eduardstal.com/blogs/uctronics-rack-display/U6143_ssd1306.zip
+sudo apt install unzip 
+unzip U6143_ssd1306.zip
+rm U6143_ssd1306.zip
+cd U6143_ssd1306/C
+sudo systemctl enable rc-local.service
+
+Append to the end of rc.local
+
+#!/bin/sh
+cd /home/eduardstal/U6143_ssd1306/C
+sudo make clean
+sudo make
+sudo ./display &
+
+sudo systemctl restart rc-local.service
+
+
+
+For Raspberry pi: 
+1. Check if rc.local file exists. 
+
+
+
+cd /home/pi
+wget https://eduardstal.com/blogs/uctronics-rack-display/U6143_ssd1306.zip
+cd U6143_ssd1306/C
+sudo raspi-config nonint do_i2c 0
+sudo make clean && sudo make
+
+Apend to the end of rc.local 
+
+cd /home/pi/U6143_ssd1306/C
+sudo make clean 
+sudo make 
+sudo ./display &
+
+
+
+
+
+
+
