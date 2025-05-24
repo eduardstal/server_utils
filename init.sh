@@ -19,18 +19,18 @@ fi
 
 echo "Detected OS: $OS"
 
-if [ "$OS" = "Raspberry Pi OS" ]; then
-    echo "Setting up CPU temperature utility..."
+# Common setup for both OSes
+echo "Setting up CPU temperature utility..."
 
-    # Check for gcc
-    if ! command -v gcc &> /dev/null; then
-        echo "Installing gcc..."
-        sudo apt update && sudo apt install -y gcc
-    fi
+# Check for gcc
+if ! command -v gcc &> /dev/null; then
+    echo "Installing build-essential..."
+    sudo apt update && sudo apt install -y build-essential
+fi
 
-    # Create temp.c
-    echo "Creating temp.c..."
-    cat << 'EOF' > temp.c
+# Create temp.c
+echo "Creating temp.c..."
+cat << 'EOF' > temp.c
 #include <stdio.h>
 
 int main(int argc, char *argv[]) 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
    int temp = 0;
    fp = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
    if (fp == NULL) {
-       printf(">> Error reading temperature!\n");
+       printf(">> Error reading temperature! Check if thermal zone exists.\n");
        return 1;
    }
    fscanf(fp, "%d", &temp);
@@ -51,24 +51,28 @@ int main(int argc, char *argv[])
 }
 EOF
 
-    # Compile
-    echo "Compiling temp.c..."
-    gcc temp.c -o temp
-    if [ $? -ne 0 ]; then
-        echo "Compilation failed."
-        exit 1
-    fi
+# Compile
+echo "Compiling temp.c..."
+gcc temp.c -o temp
+if [ $? -ne 0 ]; then
+    echo "Compilation failed."
+    exit 1
+fi
 
-    # Install to /usr/local/bin
-    echo "Installing temp utility..."
-    sudo mv temp /usr/local/bin/
-    echo "Installation complete. Run 'temp' to check CPU temperature."
+# Install to /usr/local/bin
+echo "Installing temp utility..."
+sudo mv temp /usr/local/bin/
+echo "Installation complete. Run 'temp' to check CPU temperature."
 
+# OS-specific configurations
+if [ "$OS" = "Raspberry Pi OS" ]; then
+    echo "Running Raspberry Pi OS specific tasks..."
+    # Add RPi-specific commands here
+    
 elif [ "$OS" = "Ubuntu" ]; then
-    echo "Ubuntu detected. Add Ubuntu-specific setup steps here."
-    # Placeholder for future Ubuntu tasks
+    echo "Running Ubuntu specific tasks..."
+    # Add Ubuntu-specific commands here
 fi
 
 echo "Server setup script completed."
-
 #https://eduardstal.com/blogs/uctronics-rack-display/U6143_ssd1306.zip
