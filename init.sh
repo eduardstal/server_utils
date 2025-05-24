@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Detect OS
+#######################
+##### Detect OS #######
+#######################
 OS="Unknown"
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -19,7 +21,9 @@ fi
 
 echo "Detected OS: $OS"
 
-# Common setup for both OSes
+###########################
+##### Temp shortcut #######
+###########################
 echo "Setting up CPU temperature utility..."
 
 # Check for gcc
@@ -75,4 +79,9 @@ elif [ "$OS" = "Ubuntu" ]; then
 fi
 
 echo "Server setup script completed."
+
+###########################
+##### Install Display #####
+###########################
+
 #https://eduardstal.com/blogs/uctronics-rack-display/U6143_ssd1306.zip
