@@ -21,20 +21,35 @@ fi
 
 echo "Detected OS: $OS"
 
+#######################
+#### Full Upgrade #####
+#######################
+
+sudo apt update && sudo apt upgrade -y
+
 ###########################
 ##### Temp shortcut #######
 ###########################
-echo "Setting up CPU temperature utility..."
 
-# Check for gcc
-if ! command -v gcc &> /dev/null; then
-    echo "Installing build-essential..."
-    sudo apt update && sudo apt install -y build-essential
-fi
+# Check if temp already exists
+if command -v temp &> /dev/null; then
+    echo "Temp utility already exists - skipping installation"
+else
+    echo "Setting up CPU temperature utility..."
 
-# Create temp.c
-echo "Creating temp.c..."
-cat << 'EOF' > temp.c
+    ################################
+    #### Build Tools Check #########
+    ################################
+    if ! command -v gcc &> /dev/null; then
+        echo "Installing gcc..."
+        sudo apt install -y gcc  # Changed to only gcc
+    fi
+
+    ################################
+    #### Create Temp Program #######
+    ################################
+    echo "Creating temp.c..."
+    cat << 'EOF' > temp.c
 #include <stdio.h>
 
 int main(int argc, char *argv[]) 
@@ -55,20 +70,26 @@ int main(int argc, char *argv[])
 }
 EOF
 
-# Compile
-echo "Compiling temp.c..."
-gcc temp.c -o temp
-if [ $? -ne 0 ]; then
-    echo "Compilation failed."
-    exit 1
+    ################################
+    #### Compile & Install #########
+    ################################
+    echo "Compiling temp.c..."
+    gcc temp.c -o temp || {
+        echo "Compilation failed - cleaning up"
+        rm -f temp.c temp 2>/dev/null
+        exit 1
+    }
+
+    echo "Installing temp utility..."
+    sudo mv temp /usr/local/bin/
+    rm -f temp.c  # Cleanup source file
+    
+    echo "Installation complete. Run 'temp' to check CPU temperature."
 fi
 
-# Install to /usr/local/bin
-echo "Installing temp utility..."
-sudo mv temp /usr/local/bin/
-echo "Installation complete. Run 'temp' to check CPU temperature."
-
-# OS-specific configurations
+##############################
+##### OS Specific Tasks ######
+##############################
 if [ "$OS" = "Raspberry Pi OS" ]; then
     echo "Running Raspberry Pi OS specific tasks..."
     # Add RPi-specific commands here
